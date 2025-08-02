@@ -1,4 +1,4 @@
-import { signup as signupUser, login as loginUser, getAllUsers, registerUser, getUserCertificates } from '../services/user-service.js';
+import { signup as signupUser, login as loginUser, getAllUsers, registerUser, getUserCertificates, googleLoginUser } from '../services/user-service.js';
 
 export const signup = async (req,res) => {
     const user = req.body;
@@ -16,6 +16,18 @@ export const login = async (req,res) => {
     const user = req.body;
     try {
         const resObj = await loginUser(user);
+        res.status(200).json(resObj);
+    } catch (err) {
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
+    }
+}
+
+export const loginWithGoogle = async (req,res) => {
+    const { token } = req.body;
+    try {
+        const resObj = await googleLoginUser(token);
         res.status(200).json(resObj);
     } catch (err) {
         res.status(err.statusCode || 500).json({

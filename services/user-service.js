@@ -3,6 +3,7 @@ import { Registration } from "../models/registration-model.js";
 import { HttpError } from "../utils/services/http-error.js";
 import { compareHash, hashPassword } from "../utils/services/password-hash.js";
 import { generateToken } from "../utils/services/token.js";
+import axios from "axios";
 
 export const signup = async (user) => {
     try {
@@ -56,6 +57,41 @@ export const login = async (user) => {
         throw err;
     }
 }
+
+export const googleLoginUser = async (token) => {
+    try {
+
+        const res = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const { email } = res.data;
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            user = new User({
+                name: email.split('@')[0],
+                email
+            });
+            await user.save({ validateBeforeSave: false });
+        }
+
+        return {
+            token: generateToken(user.email),
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+        };
+    } catch (err) {
+        throw err;
+    }
+};
 
 export const getAllUsers = async () => {
     try {
