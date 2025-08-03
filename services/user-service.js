@@ -40,7 +40,7 @@ export const login = async (user) => {
             throw new HttpError('User not found', 404);
         }
 
-        if(!compareHash(user.password, existingUser.password)){
+        if(!existingUser.password || !compareHash(user.password, existingUser.password)){
             throw new HttpError('Invalid credentials', 401);
         }
 
