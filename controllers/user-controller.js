@@ -1,4 +1,4 @@
-import { signup as signupUser, login as loginUser, getAllUsers, registerUser, getUserCertificates, googleLoginUser } from '../services/user-service.js';
+import { signup as signupUser, login as loginUser, getAllUsers, registerUser, getUserCertificates, googleLoginUser, getAllUserEvents } from '../services/user-service.js';
 
 export const signup = async (req,res) => {
     const user = req.body;
@@ -69,3 +69,15 @@ export const getCertificates = async (req,res) => {
         });
     }
 }
+
+export const getUserEvents = async (req, res) => {
+    const { userId } = req.body;
+    try {
+        const events = await getAllUserEvents(userId);
+        res.status(200).json(events);
+    } catch (err) {
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
+    }
+};

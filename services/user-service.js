@@ -82,7 +82,7 @@ export const googleLoginUser = async (token) => {
         return {
             token: generateToken(user.email),
             user: {
-                id: user._id,
+                _id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
@@ -136,6 +136,16 @@ export const getUserCertificates = async (userId) => {
     try {
         const certificates = await Registration.find({ student: userId, attendanceMarked: true }).populate('event', 'title date location');
         return certificates;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getAllUserEvents = async (userId) => {
+    try {
+        const registrations = await Registration.find({ student: userId }).populate('event');
+        const events = registrations.map(reg => reg.event);
+        return events;
     } catch (err) {
         throw err;
     }
