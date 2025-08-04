@@ -134,7 +134,7 @@ export const registerUser = async (registration) => {
 
 export const getUserCertificates = async (userId) => {
     try {
-        const certificates = await Registration.find({ student: userId, attendanceMarked: true }).populate('event', 'title date location');
+        const certificates = await Registration.find({ student: userId, attendanceMarked: true }).populate('event');
         return certificates;
     } catch (err) {
         throw err;
@@ -144,9 +144,42 @@ export const getUserCertificates = async (userId) => {
 export const getAllUserEvents = async (userId) => {
     try {
         const registrations = await Registration.find({ student: userId }).populate('event');
-        const events = registrations.map(reg => reg.event);
+        const events = registrations.map(reg => {
+            const event = reg.event.toObject();
+            event.feedback = reg.feedback;
+            event.attendanceMarked = reg.attendanceMarked;
+            return event;
+        });
         return events;
     } catch (err) {
         throw err;
     }
 }
+
+export const addUserFeedback = async (feedback) => {
+    try {
+        const { userId, eventId, rating, message } = feedback;
+
+        const registration = await Registration.findOne({ student: userId, event: eventId });
+
+        if (!registration) {
+            throw new HttpError("Registration not found for this user and event", 404);
+        }
+
+        if (registration.feedback && registration.feedback.rating && registration.feedback.comment) {
+            throw new HttpError("Feedback already submitted for this event", 409);
+        }
+
+        registration.feedback = {
+            rating,
+            comment: message,
+            submittedAt: new Date()
+        };
+
+        await registration.save();
+
+        return { message: "Feedback submitted successfully" };
+    } catch (err) {
+        throw err;
+    }
+};

@@ -1,5 +1,5 @@
 import express from 'express'
-import { getCertificates, getUserEvents, getUsers, login, loginWithGoogle, register, signup } from '../../../controllers/user-controller.js';
+import { addFeedback, getCertificates, getUserEvents, getUsers, login, loginWithGoogle, register, signup } from '../../../controllers/user-controller.js';
 import { checkToken, verifyAdmin } from '../../../utils/middlewares/auth.js';
 
 const router = express.Router();
@@ -17,5 +17,7 @@ router.post('/register', checkToken, register);
 router.post('/certificates', checkToken, getCertificates);
 
 router.post('/events', checkToken, getUserEvents);
+
+router.post('/feedback', checkToken, addFeedback);
 
 export default router;

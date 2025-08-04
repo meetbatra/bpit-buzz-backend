@@ -18,6 +18,19 @@ const registrationSchema = new Schema({
     attendanceMarked: {
         type: Boolean,
         default: false,
+    },
+    feedback: {
+        rating: {
+            type: Number,
+            min: 1,
+            max: 5,
+        },
+        comment: {
+            type: String,
+        },
+        submittedAt: {
+            type: Date,
+        }
     }
 });
 
