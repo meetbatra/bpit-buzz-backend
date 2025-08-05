@@ -4,8 +4,6 @@ import { HttpError } from "../utils/services/http-error.js";
 
 export const addNewEvent = async (event) => {
     try {
-        event.posterUrl = process.env.POSTER_BASE_URL+event.title+".jpg";
-
         const eventObj = await Event.create(event);
 
         if(eventObj && eventObj._id){
@@ -49,6 +47,25 @@ export const markUserAttendance = async (data) => {
         return {
             message: "Attendance updated"
         }
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const getFeedbacks = async (eventId) => {
+    try {
+        const registrations = await Registration.find({
+            event: eventId,
+            'feedback.rating': { $exists: true }
+        }).populate('student');
+
+        const feedbacks = registrations.map(reg => ({
+            _id: reg._id,
+            student: reg.student,
+            feedback: reg.feedback
+        }));
+
+        return feedbacks;
     } catch (err) {
         throw err;
     }

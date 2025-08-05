@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { addNewEvent, getAllEvents, getRegisteredEventUsers, markUserAttendance } from '../services/event-service.js';
+import { addNewEvent, getAllEvents, getRegisteredEventUsers, markUserAttendance, getFeedbacks as fetchFeedbacks } from '../services/event-service.js';
+import { uploadPosterToS3 } from '../utils/services/s3-upload.js';
 
 export const addEvent = async (req,res) => {
     const posterFile = req.files.poster || req.files['poster[]'];
@@ -13,13 +14,16 @@ export const addEvent = async (req,res) => {
 
         const filename = req.body.title + '.jpg';
         const data = posterFile.data;
-        const uploadPath = path.join(process.cwd(), 'upload', filename);
-        fs.writeFileSync(uploadPath, data);
+        
+        req.body.posterUrl = await uploadPosterToS3(data, filename);
+
         const result = await addNewEvent(req.body);
         return res.status(200).json(result);
     } catch(err) {
         console.error(err);
-        res.status(500).json({ message: 'Error saving poster' });
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
     }
 }
 
@@ -29,7 +33,9 @@ export const getEvents = async (req,res) => {
         res.status(200).json(events);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Error sending events' });
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
     }
 }
 
@@ -40,7 +46,9 @@ export const getRegisteredUsers = async (req,res) => {
         res.status(200).json(users);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Error fetch registered users' });
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
     }
 }
 
@@ -50,6 +58,21 @@ export const markAttendance = async (req,res) => {
         res.status(200).json(message);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Error marking attendance' });
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
+    }
+}
+
+export const getFeedbacks = async (req,res) => {
+    const { eventId } = req.body;
+    try {
+        const feedbacks = await fetchFeedbacks(eventId);
+        res.status(200).json(feedbacks);
+    } catch (err) {
+        console.error(err);
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
     }
 }

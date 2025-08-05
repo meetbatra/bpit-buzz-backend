@@ -1,5 +1,5 @@
 import express from 'express'
-import { addEvent, getEvents, getRegisteredUsers, markAttendance } from '../../../controllers/event-controller.js';
+import { addEvent, getEvents, getFeedbacks, getRegisteredUsers, markAttendance } from '../../../controllers/event-controller.js';
 import { verifyAdmin } from '../../../utils/middlewares/auth.js';
 
 const router = express.Router();
@@ -11,5 +11,7 @@ router.get('/all', getEvents);
 router.post('/users', verifyAdmin, getRegisteredUsers);
 
 router.post('/attendance', verifyAdmin, markAttendance);
+
+router.post('/feedbacks', verifyAdmin, getFeedbacks);
 
 export default router;

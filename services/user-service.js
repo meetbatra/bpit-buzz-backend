@@ -166,6 +166,10 @@ export const addUserFeedback = async (feedback) => {
             throw new HttpError("Registration not found for this user and event", 404);
         }
 
+        if (!registration.attendanceMarked) {
+            throw new HttpError("Feedback can only be given after attending the event", 400);
+        }
+
         if (registration.feedback && registration.feedback.rating && registration.feedback.comment) {
             throw new HttpError("Feedback already submitted for this event", 409);
         }
@@ -183,3 +187,22 @@ export const addUserFeedback = async (feedback) => {
         throw err;
     }
 };
+
+export const getUserFeedback = async (userId) => {
+    try {
+        const registrations = await Registration.find({
+            student: userId,
+            'feedback.rating': { $exists: true }
+        }).populate('event');
+
+        const feedbacks = registrations.map(reg => ({
+            _id: reg._id,
+            event: reg.event,
+            feedback: reg.feedback
+        }));
+
+        return feedbacks;
+    } catch (err) {
+        throw err;
+    }
+}
