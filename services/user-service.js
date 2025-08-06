@@ -123,8 +123,17 @@ export const getAllUsers = async () => {
 
 export const registerUser = async (registration) => {
     try {
+        const existingRegistration = await Registration.findOne({
+            student: registration.student,
+            event: registration.event
+        });
+
+        if (existingRegistration) {
+            throw new HttpError("Already registered for this event", 409);
+        }
+
         const registered = await Registration.create(registration);
-        if(registered && registered._id){
+        if (registered && registered._id) {
             return { message: "Successfully registered for event" }
         }
     } catch (err) {
