@@ -1,3 +1,4 @@
+import { Event } from "../models/event-model.js";
 import { User } from "../models/user-model.js"
 import { Registration } from "../models/registration-model.js";
 import { HttpError } from "../utils/services/http-error.js";
@@ -123,6 +124,11 @@ export const getAllUsers = async () => {
 
 export const registerUser = async (registration) => {
     try {
+        const user = await User.findById(registration.student);
+        if (user && user.role === 'admin') {
+            throw new HttpError("Admin cannot register for events", 403);
+        }
+
         const existingRegistration = await Registration.findOne({
             student: registration.student,
             event: registration.event
@@ -215,3 +221,55 @@ export const getUserFeedback = async (userId) => {
         throw err;
     }
 }
+
+export const getAdminAnalytics = async () => {
+    try {
+        const totalEvents = await Event.countDocuments();
+        const totalRegistrations = await Registration.countDocuments();
+
+        const attendanceMarked = await Registration.countDocuments({ attendanceMarked: true });
+        const attendanceRate = totalRegistrations === 0 ? 0 : ((attendanceMarked / totalRegistrations) * 100).toFixed(2);
+
+        const topEvents = await Registration.aggregate([
+            {
+                $group: {
+                    _id: "$event",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { count: -1 }
+            },
+            {
+                $limit: 5
+            },
+            {
+                $lookup: {
+                    from: "events",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "event"
+                }
+            },
+            {
+                $unwind: "$event"
+            },
+            {
+                $project: {
+                    _id: 0,
+                    title: "$event.title",
+                    registrations: "$count"
+                }
+            }
+        ]);
+
+        return {
+            totalEvents,
+            totalRegistrations,
+            attendanceRate: `${attendanceRate}%`,
+            topEvents
+        };
+    } catch (err) {
+        throw err;
+    }
+};

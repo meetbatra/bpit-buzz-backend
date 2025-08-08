@@ -1,4 +1,4 @@
-import { signup as signupUser, login as loginUser, getAllUsers, registerUser, getUserCertificates, googleLoginUser, getAllUserEvents, addUserFeedback, getUserFeedback } from '../services/user-service.js';
+import { signup as signupUser, login as loginUser, getAllUsers, registerUser, getUserCertificates, googleLoginUser, getAllUserEvents, addUserFeedback, getUserFeedback, getAdminAnalytics } from '../services/user-service.js';
 
 export const signup = async (req,res) => {
     const user = req.body;
@@ -98,6 +98,17 @@ export const getFeedback = async (req, res) => {
     try {
         const feedbacks = await getUserFeedback(userId);
         res.status(200).json(feedbacks);
+    } catch (err) {
+        res.status(err.statusCode || 500).json({
+            message: err.message
+        });
+    }
+}
+
+export const adminAnalytics = async (req, res) => {
+    try {
+        const data = await getAdminAnalytics();
+        res.status(200).json(data);
     } catch (err) {
         res.status(err.statusCode || 500).json({
             message: err.message

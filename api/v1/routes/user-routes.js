@@ -1,5 +1,5 @@
 import express from 'express'
-import { addFeedback, getCertificates, getFeedback, getUserEvents, getUsers, login, loginWithGoogle, register, signup } from '../../../controllers/user-controller.js';
+import { addFeedback, adminAnalytics, getCertificates, getFeedback, getUserEvents, getUsers, login, loginWithGoogle, register, signup } from '../../../controllers/user-controller.js';
 import { checkToken, verifyAdmin } from '../../../utils/middlewares/auth.js';
 
 const router = express.Router();
@@ -21,5 +21,7 @@ router.post('/events', checkToken, getUserEvents);
 router.post('/feedback', checkToken, getFeedback);
 
 router.post('/feedback/new', checkToken, addFeedback);
+
+router.get('/analytics', verifyAdmin, adminAnalytics);
 
 export default router;

@@ -25,8 +25,9 @@ export const getAllEvents = async () => {
 
 export const getRegisteredEventUsers = async (eventId) => {
     try {
+        const event = await Event.findById(eventId);
         const users = await Registration.find({ event: eventId }).populate("student", "name email").populate("event", "title");
-        return users;
+        return { title: event.title, users };
     } catch (err) {
         throw err;
     }
