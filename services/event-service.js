@@ -60,13 +60,15 @@ export const getFeedbacks = async (eventId) => {
             'feedback.rating': { $exists: true }
         }).populate('student');
 
+        const event = await Event.findById(eventId);
+
         const feedbacks = registrations.map(reg => ({
             _id: reg._id,
             student: reg.student,
             feedback: reg.feedback
         }));
 
-        return feedbacks;
+        return { title: event.title, feedbacks };
     } catch (err) {
         throw err;
     }
