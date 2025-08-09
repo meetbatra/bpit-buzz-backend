@@ -273,3 +273,45 @@ export const getAdminAnalytics = async () => {
         throw err;
     }
 };
+
+export const getStudentStatistics = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new HttpError("User not found", 404);
+        }
+
+        const registrations = await Registration.find({ student: userId });
+
+        const totalRegistered = registrations.length;
+        const totalAttended = registrations.filter(r => r.attendanceMarked).length;
+        const totalMissed = totalRegistered - totalAttended;
+
+        const attendanceOverview = [
+            { label: "Attended", value: totalAttended },
+            { label: "Missed", value: totalMissed }
+        ];
+
+        const ratingsCount = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        registrations.forEach(reg => {
+            if (reg.feedback && typeof reg.feedback.rating === "number" && reg.feedback.rating >= 1 && reg.feedback.rating <= 5) {
+                ratingsCount[reg.feedback.rating]++;
+            }
+        });
+
+        const userRatings = [1, 2, 3, 4, 5].map(n => ({
+            rating: `${n} Star${n > 1 ? "s" : ""}`,
+            count: ratingsCount[n]
+        }));
+
+        return {
+            totalRegistered,
+            totalAttended,
+            totalMissed,
+            attendanceOverview,
+            userRatings
+        };
+    } catch (err) {
+        throw err;
+    }
+};
