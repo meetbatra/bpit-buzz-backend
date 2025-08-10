@@ -10,7 +10,6 @@ const app = express();
 
 dotenv.config();
 app.use(cors());
-app.use('/upload', express.static('upload'));
 app.use(express.json());
 app.use(fileUpload({limits :{fileSize: 5 * 1024 * 1024} }));
 
