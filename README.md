@@ -13,6 +13,7 @@ A robust and scalable RESTful API backend for the BPIT Buzz event management app
 ### 📅 Event Management API
 - **RSVP System** - User registration and attendance tracking
 - **File Upload Support** - Event posters handling
+- **AWS S3 File Storage** - Secure cloud storage for event posters
 - **Event Analytics** - Attendance statistics and insights
 
 ### 👥 User Management
@@ -35,6 +36,7 @@ A robust and scalable RESTful API backend for the BPIT Buzz event management app
 - **Express.js** - Fast, unopinionated web framework
 - **MongoDB** - NoSQL database for flexible data storage
 - **Mongoose** - Elegant MongoDB object modeling
+- **AWS S3** - Cloud storage service for file management
 
 ### Authentication & Security
 - **JWT (jsonwebtoken)** - Token-based authentication
@@ -44,6 +46,7 @@ A robust and scalable RESTful API backend for the BPIT Buzz event management app
 
 ### File Upload & Middleware
 - **express-fileupload** - File upload handling middleware
+- **AWS S3** - Cloud storage for posters
 
 ### Development Tools
 - **Nodemon** - Development server with hot reload
